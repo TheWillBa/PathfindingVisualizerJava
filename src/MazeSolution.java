@@ -4,7 +4,10 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class MazeSolution {
+    private static int NUM_CALLS_TO_HELPER = 0;
+
     public static void main(String[] args){
+
         int[][] maze = {
                 {0,0,0,0,0,0},
                 {1,1,1,1,1,0},
@@ -14,12 +17,44 @@ public class MazeSolution {
                 {0,0,0,0,0,0}
         };
 
+/*
+        int n = 8;
+        int[][] maze = new int[n][n];
+
+        for(int i = 0; i <= n-1; i++){
+            for(int j = 0; j <= n-1; j++){
+                if(Math.random() < 0.5)
+                maze[i][j] = 1;
+            }
+        }
+
+        maze[0][0] = 0;
+        maze[n-1][n-1] = 0;*/
+
+
+
         print2DArray(maze);
 
-        int length = solution(maze);
-        System.out.println("\nThe min length is: " + length);
+        Set<Pos> set = solution(maze);
+        System.out.println("\nThe min length is: " + set.size() + "");
+        System.out.println("Num calls: " + NUM_CALLS_TO_HELPER + "\n");
+
+        for(Pos p : set){
+            maze[p.x][p.y] = 3;
+        }
+
+        print2DArray(maze);
 
 
+
+    }
+
+    public static class TrackerCell{
+        boolean tVisit;
+        boolean fVisit;
+        boolean visitComplete(){
+            return fVisit && tVisit;
+        }
     }
 
     public static class Pos{
@@ -53,18 +88,26 @@ public class MazeSolution {
             this.hasSkipped = hasSkipped;
             this.current = current;
         }
+
     }
 
-    public static int solution(int[][] maze){
-        scan(maze);
-        PathSearch start = new PathSearch(new HashSet<>(), false, new Pos(0,0));
-        Queue<PathSearch> todo = new LinkedList();
+    public static Set<Pos> solution(int[][] map) {
+        scan(map);
+        PathSearch start = new PathSearch(new HashSet<>(), false, new Pos(0, 0));
+        Queue<PathSearch> todo = new LinkedList<>();
         todo.add(start);
-        Set<Pos> path = solutionHelper(maze, todo);
-        return path.size();
+        TrackerCell[][] tracker = new TrackerCell[map.length][map[0].length];
+        for(int i = 0; i < tracker.length; ++i){
+            for(int j = 0; j < tracker[i].length; ++j){
+                tracker[i][j] = new TrackerCell();
+            }
+        }
+        Set<Pos> path = solutionHelper(map, tracker, todo);
+        return path;
     }
 
-    public static Set<Pos> solutionHelper(int[][] maze, Queue<PathSearch> todo){
+    public static Set<Pos> solutionHelper(int[][] maze, TrackerCell[][] tracker, Queue<PathSearch> todo){
+        NUM_CALLS_TO_HELPER++;
         PathSearch current = todo.remove();
         Set<Pos> path = current.pathSoFar;
         int x = current.current.x;
@@ -79,16 +122,20 @@ public class MazeSolution {
             int ii = (int) Math.round(Math.sin(t));
             int val = safeGet(i + x, ii + y, maze);
             Pos pos = new Pos(x + i, y + ii);
-
+            if(val == -1) continue;
             // Don't recurse if OOB, a wall, already reached here, or a potential skip and have skipped already
-            if(val == -1 || val == 1 || path.contains(pos) || (val == 2 && hasSkipped)) continue;
+            if(val == -1 || val == 1 || path.contains(pos) || (val == 2 && hasSkipped) || tracker[pos.x][pos.y].visitComplete())
+                continue;
+
+            tracker[pos.x][pos.y].tVisit = hasSkipped;
 
             boolean skipped = val == 2;
+
             PathSearch ps = new PathSearch(new HashSet<Pos>(path), skipped, pos);
             todo.add(ps);
         }
 
-        return solutionHelper(maze, todo);
+        return solutionHelper(maze, tracker, todo);
     }
 
     /**
