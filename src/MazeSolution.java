@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class MazeSolution {
+    private static int NUM_CALLS_TO_HELPER = 0;
     public static void main(String[] args){
         int[][] maze = {
                 {0,0,0,0,0,0},
@@ -14,10 +15,33 @@ public class MazeSolution {
                 {0,0,0,0,0,0}
         };
 
+/*
+        int n = 8;
+        int[][] maze = new int[n][n];
+
+        for(int i = 0; i <= n-1; i++){
+            for(int j = 0; j <= n-1; j++){
+                if(Math.random() < 0.5)
+                maze[i][j] = 1;
+            }
+        }
+
+        maze[0][0] = 0;
+        maze[n-1][n-1] = 0;*/
+
+
+
         print2DArray(maze);
 
-        int length = solution(maze);
-        System.out.println("\nThe min length is: " + length);
+        Set<Pos> set = solution(maze);
+        System.out.println("\nThe min length is: " + set.size() + "");
+        System.out.println("Num calls: " + NUM_CALLS_TO_HELPER + "\n");
+
+        for(Pos p : set){
+            maze[p.x][p.y] = 3;
+        }
+
+        print2DArray(maze);
 
 
     }
@@ -55,16 +79,17 @@ public class MazeSolution {
         }
     }
 
-    public static int solution(int[][] maze){
+    public static Set<Pos> solution(int[][] maze){
         scan(maze);
         PathSearch start = new PathSearch(new HashSet<>(), false, new Pos(0,0));
         Queue<PathSearch> todo = new LinkedList();
         todo.add(start);
         Set<Pos> path = solutionHelper(maze, todo);
-        return path.size();
+        return path;
     }
 
     public static Set<Pos> solutionHelper(int[][] maze, Queue<PathSearch> todo){
+        ++NUM_CALLS_TO_HELPER;
         PathSearch current = todo.remove();
         Set<Pos> path = current.pathSoFar;
         int x = current.current.x;
