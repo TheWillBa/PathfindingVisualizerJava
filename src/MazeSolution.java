@@ -8,17 +8,17 @@ public class MazeSolution {
 
     public static void main(String[] args){
 
-        int[][] maze = {
+        /*int[][] maze = {
                 {0,0,0,0,0,0},
                 {1,1,1,1,1,0},
                 {0,0,0,0,0,0},
                 {0,1,1,1,1,1},
                 {0,1,1,1,1,1},
                 {0,0,0,0,0,0}
-        };
+        };*/
 
-/*
-        int n = 8;
+
+        int n = 20;
         int[][] maze = new int[n][n];
 
         for(int i = 0; i <= n-1; i++){
@@ -29,7 +29,7 @@ public class MazeSolution {
         }
 
         maze[0][0] = 0;
-        maze[n-1][n-1] = 0;*/
+        maze[n-1][n-1] = 0;
 
 
 
@@ -52,9 +52,6 @@ public class MazeSolution {
     public static class TrackerCell{
         boolean tVisit;
         boolean fVisit;
-        boolean visitComplete(){
-            return fVisit && tVisit;
-        }
     }
 
     public static class Pos{
@@ -124,10 +121,19 @@ public class MazeSolution {
             Pos pos = new Pos(x + i, y + ii);
             if(val == -1) continue;
             // Don't recurse if OOB, a wall, already reached here, or a potential skip and have skipped already
-            if(val == -1 || val == 1 || path.contains(pos) || (val == 2 && hasSkipped) || tracker[pos.x][pos.y].visitComplete())
+            if(val == 1 || path.contains(pos) || (val == 2 && hasSkipped))
                 continue;
 
-            tracker[pos.x][pos.y].tVisit = hasSkipped;
+            if(hasSkipped && tracker[pos.x][pos.y].tVisit) continue;
+            if(!hasSkipped && tracker[pos.x][pos.y].fVisit) continue;
+
+            if (hasSkipped) {
+                tracker[pos.x][pos.y].tVisit = true;
+            }
+            else{
+                tracker[pos.x][pos.y].fVisit = true;
+            }
+
 
             boolean skipped = val == 2;
 
