@@ -11,7 +11,7 @@ public class Main {
                 {0,0,0,0,0,0}
         };
 
-        ShortestPathAlgorithm spa = new ModifedBFS(
+        ShortestPathAlgorithm spa = new ModifiedBFS(
                 maze,
                 new Pos(0,0),
                 new Pos(maze.length - 1, maze[0].length - 1)
