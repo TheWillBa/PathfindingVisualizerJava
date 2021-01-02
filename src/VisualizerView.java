@@ -88,6 +88,12 @@ public class VisualizerView extends Applet {
             if(maze[p.x()][p.y()] != 0) g.setColor(Color.red);
             g.fillRect(p.y()*side + xOffset, p.x()*side + yOffset, side, side);
             if(maze[p.x()][p.y()] != 0) g.setColor(Color.MAGENTA);
+
+            try {
+                wait(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
 
