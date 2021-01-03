@@ -2,6 +2,7 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.List;
 
 public class VisualizerView extends Applet {
@@ -57,6 +58,7 @@ public class VisualizerView extends Applet {
 
 
         while(!spa.done()){
+            System.out.println(Arrays.toString(spa.nextPoses()));
             spa.next();
         }
 

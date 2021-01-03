@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.IntFunction;
 
 public class ModifiedBFS implements ShortestPathAlgorithm {
 
@@ -44,8 +45,13 @@ public class ModifiedBFS implements ShortestPathAlgorithm {
      * @return the s
      */
     @Override
-    public Queue<Pos> nextPoses() {
-        return null;
+    public Pos[] nextPoses() {
+        Pos[] poses = new Pos[todo.size()];
+        int i = 0;
+        for(PathSearch ps : todo){
+            poses[i++] = ps.current;
+        }
+        return poses;
     }
 
     /**
@@ -188,5 +194,13 @@ public class ModifiedBFS implements ShortestPathAlgorithm {
             this.current = current;
             this.listSoFar = listSoFar;
         }
+
+        public Pos current(){
+            return current;
+        }
     }
+
+
+
+
 }
