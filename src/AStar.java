@@ -108,6 +108,7 @@ public class AStar extends AbstractSearchAlgorithm {
         path = bPath;
     }
 
+    // TODO should reuse this elsewhere
     private Set<Pos> neighbors(Pos p) {
 
         Set<Pos> neighbors = new HashSet<Pos>();
@@ -144,8 +145,6 @@ public class AStar extends AbstractSearchAlgorithm {
 
         return dx + dy;
     }
-
-
 
 
     private class PosH extends Pos implements Comparable<Pos>{
