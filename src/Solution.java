@@ -1,16 +1,27 @@
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The solution class submitted to foobar, with some optimizations over the <code>MazeSolution</code>
  */
 public class Solution {
+
     public static class TrackerCell {
         boolean tVisit;
         boolean fVisit;
+    }
+
+
+    public static class PathSearch {
+        Set<Pos> pathSoFar;
+        boolean hasSkipped;
+        Pos current;
+
+        public PathSearch(Set<Pos> pathSoFar, boolean hasSkipped, Pos current) {
+            this.pathSoFar = pathSoFar;
+            this.hasSkipped = hasSkipped;
+            this.current = current;
+        }
     }
 
     public static class Pos {
@@ -36,19 +47,12 @@ public class Solution {
 
     }
 
-    public static class PathSearch {
-        Set<Pos> pathSoFar;
-        boolean hasSkipped;
-        Pos current;
-
-        public PathSearch(Set<Pos> pathSoFar, boolean hasSkipped, Pos current) {
-            this.pathSoFar = pathSoFar;
-            this.hasSkipped = hasSkipped;
-            this.current = current;
-        }
-
-    }
-
+    /**
+     * returns the length of the shortest path from (0,0) to (length-1, length-1) in the grid,
+     * -1 if the path does not exist
+     * @param map
+     * @return
+     */
     public static int solution(int[][] map) {
         scan(map);
         PathSearch start = new PathSearch(new HashSet<>(), false, new Pos(0, 0));
@@ -61,11 +65,18 @@ public class Solution {
             }
         }
         Set<Pos> path = solutionHelper(map, tracker, todo);
-        return path.size();
+        return path == null ? -1 : path.size();
     }
 
     public static Set<Pos> solutionHelper(int[][] maze, TrackerCell[][] tracker, Queue<PathSearch> todo) {
-        PathSearch current = todo.remove();
+        PathSearch current;
+        try{
+            current = todo.remove();
+        }
+        catch(NoSuchElementException e){
+            return null;
+        }
+
         Set<Pos> path = current.pathSoFar;
         int x = current.current.x;
         int y = current.current.y;
