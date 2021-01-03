@@ -77,6 +77,7 @@ public class AStar extends AbstractSearchAlgorithm {
             if (val == -1 || val == 1 || closed.contains(pos) || openSet.contains(pos))
                 continue;
 
+
             open.add(pos);
             openSet.add(pos);
             // Leaving breadcrumbs
@@ -85,6 +86,8 @@ public class AStar extends AbstractSearchAlgorithm {
 
     }
 
+    // TODO fix problems with f -> sum of g and h, g -> movement to this, h -> est. distance from goal scores
+
     private void backtrackPath() {
         LinkedList<PosH> bPath = new LinkedList<>();
 
@@ -92,17 +95,20 @@ public class AStar extends AbstractSearchAlgorithm {
         bPath.addFirst(n);
         int k = distances.get(n);
 
+        PosH toAdd = null;
         while(!n.equals(start)){
             for(PosH p : distances.keySet()){
                 if(!neighbors(p).contains(n)) continue;
 
-                if(distances.get(p) == k - 1){
+                if(distances.get(p) < k){
                     bPath.addFirst(p);
                     n = p;
                     k--;
                     break;
                 }
             }
+
+
         }
 
         path = bPath;
@@ -140,10 +146,12 @@ public class AStar extends AbstractSearchAlgorithm {
 
     private int distanceFrom(int x, int y, Pos p) {
         // Manhattan distance, use euclidean if can move diagonal
-        int dx = Math.abs(x - p.x());
-        int dy = Math.abs(y - p.y());
+        int dx = 10*Math.abs(x - p.x());
+        int dy = 10*Math.abs(y - p.y());
 
         return dx + dy;
+
+        //return (int) Math.sqrt(dx*dx + dx*dy);
     }
 
 
@@ -169,6 +177,8 @@ public class AStar extends AbstractSearchAlgorithm {
                 return -1;
             }
             else { // heuristic the same
+
+
                 if(distanceFrom(x, y, end) > distanceFrom(p.x,  p.y, end)){
                     return 1;
                 }
