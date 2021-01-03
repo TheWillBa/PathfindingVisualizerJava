@@ -1,14 +1,10 @@
 import java.util.*;
 import java.util.function.IntFunction;
 
-public class ModifiedBFS implements ShortestPathAlgorithm {
+public class ModifiedBFS extends AbstractSearchAlgorithm {
 
     private Queue<PathSearch> todo;
     private TrackerCell[][] tracker;
-    private int[][] map;
-    private Pos start;
-    private Pos end;
-    private List<Pos> path;
 
     public ModifiedBFS(int[][] map, Pos start, Pos end){
         setMap(map, start, end);
@@ -118,26 +114,6 @@ public class ModifiedBFS implements ShortestPathAlgorithm {
     }
 
     /**
-     * Returns true if the algorithms has finished
-     *
-     * @return true if done
-     */
-    @Override
-    public boolean done() {
-        return path != null;
-    }
-
-    /**
-     * Returns the optimal path if the algorithm is done, null if none exists
-     *
-     * @return a <code>List</code> of <code>Pos</code>s that are the optimal path for the grid
-     */
-    @Override
-    public List<Pos> path() {
-        return path;
-    }
-
-    /**
      * Scans the map and flags any walls that could potentially be removed, setting them equal to 2
      */
     private void scanMap() {
@@ -166,15 +142,6 @@ public class ModifiedBFS implements ShortestPathAlgorithm {
 
             }
         }
-    }
-
-    public int safeGet(int x, int y) {
-        if (x >= 0 && x < map.length && y >= 0 && y < map[0].length) {
-            // In bounds
-            return map[x][y];
-        }
-
-        return -1;
     }
 
     private static class TrackerCell {

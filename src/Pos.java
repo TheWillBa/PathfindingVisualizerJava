@@ -1,8 +1,8 @@
 import java.util.Objects;
 
 public class Pos {
-    private int x;
-    private int y;
+    protected int x;
+    protected int y;
 
     public Pos(int x, int y) {
         this.x = x;

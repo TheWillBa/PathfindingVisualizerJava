@@ -28,7 +28,12 @@ public interface ShortestPathAlgorithm {
      * Returns the optimal path if the algorithm is done
      * @return a <code>List</code> of <code>Pos</code>s that are the optimal path for the grid
      */
-    List<Pos> path();
+    List<? extends Pos> path();
+
+    /**
+     * Finishes the search so done becomes true
+     */
+    void finish();
 
 
 

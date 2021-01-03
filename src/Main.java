@@ -11,18 +11,17 @@ public class Main {
                 {0,0,0,0,0,0}
         };
 
-        ShortestPathAlgorithm spa = new ModifiedBFS(
+        ShortestPathAlgorithm spa = new AStar(
                 maze,
                 new Pos(0,0),
                 new Pos(maze.length - 1, maze[0].length - 1)
         );
 
+        System.out.println(spa.done());
+        spa.finish();
+        System.out.println(spa.done());
 
-        while(!spa.done()){
-            spa.next();
-        }
-
-        List<Pos> path = spa.path();
+        List<? extends Pos> path = spa.path();
 
         System.out.println("length: " + path.size());
 
