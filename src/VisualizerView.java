@@ -10,6 +10,9 @@ public class VisualizerView extends Applet {
     private int side;
     private static List<Pos> path;
 
+    int xOffset = 0;
+    int yOffset = 175;
+
     @Override
     public void init(){
         int[][] smallMaze = new int[][]{ // temp variable for use to implement drawing the grid
@@ -67,47 +70,54 @@ public class VisualizerView extends Applet {
 
     @Override
     public void paint(Graphics g){
-        int xOffset = 0;
-        int yOffset = 175;
+
 
         /*
         Draws the main grid
          */
         for(int i = 0; i < maze.length; ++i){
             for(int j = 0; j < maze[0].length; ++j){
-                if(maze[i][j] == 0) g.setColor(Color.white);
-                else g.setColor(Color.black);
-
-                g.fillRect(j*side + xOffset, i*side + yOffset,side, side);
+                if(maze[i][j] == 0) drawCell(g, i, j, Color.white);
+                else drawCell(g, i, j, Color.black);
             }
         }
 
         /*
         Draw the path on the grid
          */
-        g.setColor(Color.MAGENTA);
+
         for(Pos p : path){
-            if(maze[p.x()][p.y()] != 0) g.setColor(Color.red);
-            g.fillRect(p.y()*side + xOffset, p.x()*side + yOffset, side, side);
-            if(maze[p.x()][p.y()] != 0) g.setColor(Color.MAGENTA);
+            Color c;
+            if(maze[p.x()][p.y()] != 0) c = (Color.red);
+            else c = Color.magenta;
 
-            try {
-                wait(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            drawCell(g, p.x(), p.y(), c);
+
+            delay(500000);
         }
 
 
-        /*
-        Draws black borders around each grid square
-         */
-        for(int i = 0; i < maze.length; ++i){
-            for(int j = 0; j < maze[0].length; ++j){
-                g.setColor(Color.black);
-                g.drawRect(j*side + xOffset, i*side + yOffset,side, side);
+    }
 
-            }
-        }
+    public void drawCell(Graphics g, int x, int y, Color c){
+        Color pc = g.getColor();
+
+        g.setColor(c);
+        g.fillRect(y*side + xOffset, x*side + yOffset,side, side);
+        g.setColor(Color.black);
+        g.drawRect(y*side + xOffset, x*side + yOffset,side, side);
+
+        g.setColor(pc);
+    }
+
+    public void delay(long n)
+    {
+
+        n *= 1000;
+        long startDelay = System.nanoTime();
+        long endDelay = 0;
+        while (endDelay - startDelay < n)
+            endDelay = System.nanoTime();
+
     }
 }
