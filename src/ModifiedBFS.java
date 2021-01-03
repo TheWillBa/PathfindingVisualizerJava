@@ -45,11 +45,11 @@ public class ModifiedBFS implements ShortestPathAlgorithm {
      * @return the s
      */
     @Override
-    public Pos[] nextPoses() {
-        Pos[] poses = new Pos[todo.size()];
+    public List<Pos> nextPoses() {
+        ArrayList<Pos> poses = new ArrayList<>();
         int i = 0;
         for(PathSearch ps : todo){
-            poses[i++] = ps.current;
+            poses.add(ps.current);
         }
         return poses;
     }

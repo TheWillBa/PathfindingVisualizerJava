@@ -2,13 +2,13 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 public class VisualizerView extends Applet {
     private int[][] maze;
     private int side;
-    private static List<Pos> path;
+    ShortestPathAlgorithm spa;
 
     int xOffset = 0;
     int yOffset = 175;
@@ -53,24 +53,21 @@ public class VisualizerView extends Applet {
         side = getWidth() / maze.length;
 
 
-        ShortestPathAlgorithm spa = new ModifiedBFS(
+        spa = new ModifiedBFS(
                 maze,
                 new Pos(0,0),
                 new Pos(maze.length - 1, maze[0].length - 1)
         );
 
 
-        while(!spa.done()){
-            System.out.println(Arrays.toString(spa.nextPoses()));
-            spa.next();
-        }
 
-        path = spa.path();
+
     }
 
     @Override
     public void paint(Graphics g){
 
+        int delay = 500000/4;
 
         /*
         Draws the main grid
@@ -83,17 +80,47 @@ public class VisualizerView extends Applet {
         }
 
         /*
-        Draw the path on the grid
+        Draw the path on the grid as it searches
          */
 
-        for(Pos p : path){
+        Set<Pos> closed = new HashSet<>();
+        List<Pos> open = new ArrayList<>();
+
+        while(!spa.done()){
+
+            List<Pos> newPoses = spa.nextPoses();
+
+            for(Pos p : newPoses){
+                if(!closed.contains(p)){
+                    open.add(p);
+                }
+            }
+
+            for(Pos p : open){
+                drawCell(g, p.x(), p.y(), Color.green);
+                delay(delay);
+            }
+
+            closed.addAll(open);
+            open.clear();
+
+            spa.next();
+        }
+
+
+
+        /*
+        Draw the final path
+         */
+
+        for(Pos p : spa.path()){
             Color c;
             if(maze[p.x()][p.y()] != 0) c = (Color.red);
             else c = Color.magenta;
 
             drawCell(g, p.x(), p.y(), c);
 
-            delay(500000);
+            delay(delay);
         }
 
 

@@ -11,7 +11,7 @@ public interface ShortestPathAlgorithm {
      * Returns the set of poses that are in line to be searched in the order they are to be searched
      * @return the s
      */
-    Pos[] nextPoses();
+    List<Pos> nextPoses();
 
     /**
      * Makes the next 'recursive' call in the algorithm
