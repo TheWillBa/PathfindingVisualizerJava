@@ -1,13 +1,14 @@
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 import java.util.*;
 
 public class AStar extends AbstractSearchAlgorithm {
+    public int nodesChecked = 0;
 
-    Set<PosH> closed;
-    Queue<PosH> open;
-    Set<PosH> openSet;
-    Map<PosH, Integer> distances;
+    int scalar = 10;
+
+    PriorityQueue<Node> open;
+    Set<Node> openSet;
+    public Node[][] nodes;
+    Set<Node> closed;
 
     public AStar(int[][] map, Pos start, Pos end){
         setMap(map, start, end);
@@ -27,13 +28,29 @@ public class AStar extends AbstractSearchAlgorithm {
         this.start = start;
         this.end = end;
 
-        distances = new HashMap<>();
-        closed = new HashSet<>();
+        nodes = new Node[map.length][map[0].length];
+
+        for(int i = 0; i < nodes.length; ++i){
+            for(int j = 0; j < nodes[0].length; ++j){
+                nodes[i][j] = new Node(i,j);
+            }
+        }
+
         openSet = new HashSet<>();
         open = new PriorityQueue<>();
-        PosH s = new PosH(start);
-        distances.put(s, 0);
+
+
+        Node s = new Node(start);
+        s.gScore = 0;
+
+        nodes[s.x][s.y] = s;
+
         open.add(s);
+        openSet.add(s);
+
+        closed = new HashSet<>();
+
+
     }
 
     /**
@@ -52,142 +69,149 @@ public class AStar extends AbstractSearchAlgorithm {
     @Override
     public void next() {
 
-        if(done()) return;
+        if (done()) return;
 
-        PosH current = open.remove();
-        closed.add(current);
-        openSet.remove(current);
-
-
-        int x = current.x;
-        int y = current.y;
-
-        if(x == end.x && y == end.y){
+        if (openSet.contains(nodes[end.x][end.y])) {
+            System.out.println("Finishing...");
             backtrackPath();
             return;
         }
 
+        ++nodesChecked;
+
+        Node current = open.remove();
+        openSet.remove(current);
+        closed.add(current);
+
+        int x = current.x;
+        int y = current.y;
+
+
+        System.out.println("Current: " + current);
+
+
+
+        /*for (int i = -1; i <= 1; i++) {
+            for(int ii = -1; ii <=1 ; ii++){*/
+
         for (double t = 0; t < Math.PI * 2; t += Math.PI / 2) {
             int i = (int) Math.round(Math.cos(t));
             int ii = (int) Math.round(Math.sin(t));
-            int val = safeGet(i + x, ii + y);
-            PosH pos = new PosH(x + i, y + ii);
 
-            // Don't recurse if OOB, a wall, already reached here
-            if (val == -1 || val == 1 || closed.contains(pos) || openSet.contains(pos))
+            int val = safeGet(i + x, ii + y);
+
+            // Don't recurse if OOB or a wall
+            if (val == -1 || val == 1 || closed.contains(new Node(i + x, ii + y)))
                 continue;
 
+            Node pos = nodes[x + i][y + ii];
 
-            open.add(pos);
-            openSet.add(pos);
-            // Leaving breadcrumbs
-            distances.put(pos, distances.get(current) + 1);
+            double temp_gScore = current.gScore() + scalar /*euclideanDistanceFrom(0,0, new Pos(i,ii))*/; // In this case the distance from current to pos is always 1,
+            // So just add the scalar
+
+            if (!openSet.contains(pos) || temp_gScore < pos.gScore) {
+                if(!openSet.contains(pos)) {
+                    open.add(pos);
+                    openSet.add(pos);
+                }
+                pos.gScore = temp_gScore;
+
+                // Leaving breadcrumbs
+                pos.pred = current;
+            }
+            //}
+
+
         }
 
     }
 
-    // TODO fix problems with f -> sum of g and h, g -> movement to this, h -> est. distance from goal scores
 
     private void backtrackPath() {
-        LinkedList<PosH> bPath = new LinkedList<>();
+        LinkedList<Node> bPath = new LinkedList<>();
 
-        PosH n = new PosH(end);
-        bPath.addFirst(n);
-        int k = distances.get(n);
+        Node current = nodes[end.x][end.y];
 
-        PosH toAdd = null;
-        while(!n.equals(start)){
-            for(PosH p : distances.keySet()){
-                if(!neighbors(p).contains(n)) continue;
-
-                if(distances.get(p) < k){
-                    bPath.addFirst(p);
-                    n = p;
-                    k--;
-                    break;
-                }
-            }
-
-
+        while(current != null) {
+            bPath.addFirst(current);
+            current = current.pred;
         }
 
         path = bPath;
     }
 
-    // TODO should reuse this elsewhere
-    private Set<Pos> neighbors(Pos p) {
-
-        Set<Pos> neighbors = new HashSet<Pos>();
-        int x = p.x;
-        int y = p.y;
-
-        for (double t = 0; t < Math.PI * 2; t += Math.PI / 2) {
-            int i = (int) Math.round(Math.cos(t));
-            int ii = (int) Math.round(Math.sin(t));
-            int val = safeGet(i + x, ii + y);
-            PosH pos = new PosH(x + i, y + ii);
-
-            // Don't recurse if OOB, a wall, already reached here
-            if (val == -1 || val == 1)
-                continue;
-
-            neighbors.add(pos);
-
-        }
-
-        return neighbors;
-    }
 
 
-    private double heuristic(int x, int y){
-        //return distanceFrom( x,  y, start) + distanceFrom(x, y, end);
-        return distanceFrom( x,  y, start) + distanceFrom(x, y, end) /* * 1.1*/;
-    }
-
-    private int distanceFrom(int x, int y, Pos p) {
+    private int manhattanDistanceFrom(int x, int y, Pos p) {
         // Manhattan distance, use euclidean if can move diagonal
-        int dx = 10*Math.abs(x - p.x());
-        int dy = 10*Math.abs(y - p.y());
+        int dx = scalar*Math.abs(x - p.x());
+        int dy = scalar*Math.abs(y - p.y());
 
         return dx + dy;
 
         //return (int) Math.sqrt(dx*dx + dx*dy);
     }
 
+    private int euclideanDistanceFrom(int x, int y, Pos p) {
+        int dx = Math.abs(x - p.x());
+        int dy = Math.abs(y - p.y());
 
-    private class PosH extends Pos implements Comparable<Pos>{
+        return (int) (scalar * Math.sqrt(dx*dx + dy*dy));
 
-        public PosH(int x, int y) {
+    }
+
+
+    public class Node extends Pos implements Comparable<Node>{
+
+        private Node pred = null;
+
+        private double gScore = 0;
+        private final double weight = 0;
+
+        public Node(int x, int y) {
             super(x, y);
         }
 
-        public PosH(Pos p){
+        public Node(Pos p){
             super(p.x, p.y);
         }
 
         @Override
-        public int compareTo(Pos p) {
-            if(this.equals(p)) return 0;
+        public int compareTo(Node p) {
 
-
-            if(heuristic(x, y) > heuristic(p.x, p.y)){
+            if(fScore() > p.fScore()){
                 return 1;
             }
-            else if(heuristic(x, y) < heuristic(p.x, p.y)){
+            else if(fScore() < p.fScore()){
                 return -1;
             }
             else { // heuristic the same
-
-
-                if(distanceFrom(x, y, end) > distanceFrom(p.x,  p.y, end)){
-                    return 1;
-                }
-                else if(distanceFrom(x, y, end) < distanceFrom(p.x,  p.y, end)){
-                    return -1;
-                }
+                if(hScore() < p.hScore()) return -1;
+                else if(hScore() > p.hScore()) return 1;
                 else return 0;
             }
 
+        }
+
+        /**
+         * Used by the compareTo(), the sum of the f and g-score
+         */
+        public int fScore(){
+            return gScore() + hScore();
+        }
+
+        /**
+        A calculated distance from the starting node based on the path to get to this node
+         */
+        public int gScore(){
+            return (int) gScore;
+        }
+
+        /**
+        An estimate of the distance this PosH is from the goal; a heuristic value
+         */
+        public int hScore(){
+            return manhattanDistanceFrom(x, y, end);
         }
 
 
