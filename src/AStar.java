@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.Function;
 
 public class AStar/* implements ShortestPathAlgorithm */{
 
@@ -12,6 +13,9 @@ public class AStar/* implements ShortestPathAlgorithm */{
     private Set<Node> closed = new HashSet<>();
 
     private List<Node> path = null;
+
+    private final DistanceFunction d = (Pos p1, Pos p2) -> (euclideanDistanceFrom(p1.x(), p1.y(), p2));
+    private final NeighborFunction nf = this::diagNeighbors;
 
 
     public Set<HeuristicNode> closed() {
@@ -79,10 +83,10 @@ public class AStar/* implements ShortestPathAlgorithm */{
         }
 
 
-        for (Node neighbor : neighbors(current)) {
+        for (Node neighbor : nf.neighbors(current)) {
             if (closed.contains(neighbor)) continue;
 
-            int temp_gScore = gScores.get(current) + scalar;
+            int temp_gScore = gScores.get(current) + d.distance(current, neighbor);
 
             if (!open.contains(neighbor) || temp_gScore < gScores.get(neighbor)) {
                 gScores.put(neighbor, temp_gScore);
@@ -133,7 +137,24 @@ public class AStar/* implements ShortestPathAlgorithm */{
         return r;
     }
 
-    private int manhattanDistanceFrom(int x, int y, GridPos p) {
+    private List<Node> diagNeighbors(Node current) {
+        List<Node> r = new ArrayList<>();
+
+        // The order that this returns the neighbors in effects the bias direction of the search
+        for(int i = -1; i <= 1; ++i){
+            for(int ii = -1; ii <= 1; ++ii){
+                int x = current.x + i;
+                int y = current.y + ii;
+                int val = safeGet(x,y);
+                if(val == 0)
+                    r.add(new Node(x, y));
+            }
+        }
+
+        return r;
+    }
+
+    private int manhattanDistanceFrom(int x, int y, Pos p) {
         // Manhattan distance, use euclidean if can move diagonal
         int dx = scalar*Math.abs(x - p.x());
         int dy = scalar*Math.abs(y - p.y());
@@ -143,7 +164,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
         //return (int) Math.sqrt(dx*dx + dx*dy);
     }
 
-    private int euclideanDistanceFrom(int x, int y, GridPos p) {
+    private int euclideanDistanceFrom(int x, int y, Pos p) {
         int dx = Math.abs(x - p.x());
         int dy = Math.abs(y - p.y());
 
@@ -155,7 +176,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
     public class Node extends GridPos implements Comparable<Node>, HeuristicNode {
 
         private int gScore= 0;
-        private final int hScore = manhattanDistanceFrom(x, y, end);
+        private final int hScore = d.distance(new GridPos(x, y), end);
         private final int weight = 1;
 
         public Node(int x, int y) {
@@ -252,5 +273,15 @@ public class AStar/* implements ShortestPathAlgorithm */{
         }
 
 
+    }
+
+    @FunctionalInterface
+    private interface DistanceFunction{
+        int distance(Pos start, Pos end);
+    }
+
+    @FunctionalInterface
+    private interface NeighborFunction{
+        List<Node> neighbors(Node n);
     }
 }
