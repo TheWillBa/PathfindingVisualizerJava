@@ -6,6 +6,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
 
     private int[][] map;
     private GridPos end;
+    private GridPos start;
 
     private PriorityQueueSet<Node> open = new PriorityQueueSet<>();
     private Set<Node> closed = new HashSet<>();
@@ -33,9 +34,14 @@ public class AStar/* implements ShortestPathAlgorithm */{
         return -1;
     }
 
+    public void reset(){
+        init(map, start, end);
+    }
+
     public void init(int[][] map, GridPos start, GridPos end){
         this.map = map;
         this.end = end;
+        this.start = start;
 
         open = new PriorityQueueSet<>();
         closed = new HashSet<>();
@@ -171,7 +177,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
                 return 0;
 
                 // This return makes the algorithm more greedy towards the goal
-                // return Integer.compare(hScore(), p.hScore());
+                //return Integer.compare(hScore(), p.hScore());
             }
 
         }

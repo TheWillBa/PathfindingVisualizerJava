@@ -4,16 +4,20 @@ public class GridCreator {
     int width;
     int height;
 
-    int[][] map;
+    final int[][] map;
 
     public GridCreator(int w, int h){
         width = w;
         height = h;
-        clear();
+        map = new int[width][height];
     }
 
     public void clear(){
-        map = new int[width][height];
+        for(int i = 0; i < map.length; ++i){
+            for(int j = 0; j < map[0].length; ++j){
+                map[i][j] = 0;
+            }
+        }
     }
 
     public void flip(int x, int y){

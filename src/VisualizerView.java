@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-public class VisualizerView extends JApplet implements MouseMotionListener {
+public class VisualizerView extends JApplet implements MouseListener, MouseMotionListener {
     private int[][] maze;
     private int side;
 
@@ -133,7 +133,32 @@ public class VisualizerView extends JApplet implements MouseMotionListener {
             }
         });
 
-        //addMouseListener(this);
+        Button resetButton = new Button("Reset Path");
+        resetButton.setBounds(50,0, 80, 20);
+        add(resetButton);
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    running = false;
+                    astar.reset();
+                    repaint();
+                }
+            }
+        );
+
+        Button clearButton = new Button("Clear");
+        clearButton.setBounds(130,0, 50, 20);
+        add(clearButton);
+        clearButton.addActionListener(new ActionListener() {
+                                          @Override
+                                          public void actionPerformed(ActionEvent e) {
+                                              gc.clear();
+                                              repaint();
+                                          }
+                                      }
+        );
+
+        addMouseListener(this);
         addMouseMotionListener(this);
 
 
@@ -212,7 +237,7 @@ public class VisualizerView extends JApplet implements MouseMotionListener {
 
 
 
-
+        running = false;
     }
 
     public void drawCell(Graphics g, HeuristicNode node, Color c){
@@ -278,7 +303,7 @@ public class VisualizerView extends JApplet implements MouseMotionListener {
         gc.flip(x,y);
         lastPos = p;
         repaint();
-        //e.consume();
+        e.consume();
     }
 
     /**
@@ -289,6 +314,62 @@ public class VisualizerView extends JApplet implements MouseMotionListener {
      */
     @Override
     public void mouseMoved(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse button has been clicked (pressed
+     * and released) on a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int y = (int) Math.floor((e.getX() - xOffset) / (side * 1.0));
+        int x = (int) Math.floor((e.getY() - yOffset) / (side * 1.0));
+        System.out.println(x + ", " + y);
+        gc.flip(x,y);
+        repaint();
+        e.consume();
+    }
+
+    /**
+     * Invoked when a mouse button has been pressed on a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when a mouse button has been released on a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse enters a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse exits a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseExited(MouseEvent e) {
 
     }
 }
