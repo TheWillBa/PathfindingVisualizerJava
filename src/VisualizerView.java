@@ -222,13 +222,13 @@ public class VisualizerView extends Applet {
                 {0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
                 {0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0},
-                {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -288,7 +288,7 @@ public class VisualizerView extends Applet {
     @Override
     public void paint(Graphics g){
 
-        int delay = 20000000/100;
+        int delay = 20000000;
 
         /*
         Draws the main grid
@@ -349,27 +349,24 @@ public class VisualizerView extends Applet {
             Set<AStarStatic.Node> open = astar.open();
             Set<AStarStatic.Node> closed = astar.closed();
 
+            Queue<AStarStatic.Node> queue = new PriorityQueue<>(astar.queue());
+            int num = queue.size();
+            for(int i = 0; i < num;++i){
+                AStarStatic.Node node = queue.remove();
+                drawCell(g, node, Color.red);
+                g.drawString(Integer.toString(i), node.y*side + xOffset + side/2, node.x*side + yOffset + (int) (side * (3.0 / 4.0)));
+            }
+
             for(AStarStatic.Node node : closed){
                 //if(drawnClosed.contains(node)) continue;
                 drawCell(g, node, Color.green);
                 //drawnClosed.add(node);
             }
 
-            for(AStarStatic.Node node : open){
-                //if(drawnOpen.contains(node)) continue;
-                drawCell(g, node, Color.red);
-                //drawnOpen.add(node);
-            }
+            Queue<AStarStatic.Node> queue2 = new PriorityQueue<>(astar.queue());
 
-            Queue<AStarStatic.Node> queue = astar.queue();
-
-            int count = 1;
-            for(AStarStatic.Node node : queue){
-                drawCell(g, node, Color.lightGray);
-                g.drawString(Integer.toString(count++), node.y*side + xOffset + side/2, node.x*side + yOffset + (int) (side * (3.0 / 4.0)));
-            }
-
-            System.out.println("Looking at: " + queue.peek());
+            System.out.println("Looking at: " + queue2.peek());
+            System.out.println("Queue order: " + queue2);
 
             delay(delay/5);
             astar.tick();

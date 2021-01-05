@@ -11,7 +11,7 @@ public class AStar extends AbstractSearchAlgorithm {
     Set<Node> closed;
 
     public AStar(int[][] map, Pos start, Pos end){
-        setMap(map, start, end);
+        init(map, start, end);
     }
 
 
@@ -23,7 +23,7 @@ public class AStar extends AbstractSearchAlgorithm {
      * @param end
      */
     @Override
-    public void setMap(int[][] map, Pos start, Pos end) {
+    public void init(int[][] map, Pos start, Pos end) {
         this.map = map;
         this.start = start;
         this.end = end;
@@ -67,7 +67,7 @@ public class AStar extends AbstractSearchAlgorithm {
      * Makes the next 'recursive' call in the algorithm
      */
     @Override
-    public void next() {
+    public void tick() {
 
         if (done()) return;
 

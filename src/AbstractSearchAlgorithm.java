@@ -32,7 +32,7 @@ public abstract class AbstractSearchAlgorithm implements ShortestPathAlgorithm {
     @Override
     public void finish() {
         while(!done()){
-            next();
+            tick();
         }
     }
 

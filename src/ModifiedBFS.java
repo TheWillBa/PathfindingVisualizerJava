@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.function.IntFunction;
 
 public class ModifiedBFS extends AbstractSearchAlgorithm {
 
@@ -7,7 +6,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
     private TrackerCell[][] tracker;
 
     public ModifiedBFS(int[][] map, Pos start, Pos end){
-        setMap(map, start, end);
+        init(map, start, end);
     }
 
     /**
@@ -18,7 +17,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
      * @param end the goal <code>Pos</code> on the grid
      */
     @Override
-    public void setMap(int[][] map, Pos start, Pos end) {
+    public void init(int[][] map, Pos start, Pos end) {
         this.map = map;
         this.start = start;
         this.end = end;
@@ -54,7 +53,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
      * Makes the next 'recursive' call in the algorithm
      */
     @Override
-    public void next() {
+    public void tick() {
 
         if(done()) return;
 

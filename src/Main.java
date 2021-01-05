@@ -51,7 +51,7 @@ public class Main {
         System.out.print(map.get(5));*/
 
 
-
+        /*
         AStar a = new AStar(new int[5][5], new Pos(0,0), new Pos(4,4));
         a.next();
         a.next();
@@ -61,12 +61,51 @@ public class Main {
 
 
 
-        System.out.println(a.nextPoses());
+        System.out.println(a.nextPoses());*/
 
-        
+        PriorityQueue<Int> q = new PriorityQueue<>();
+        Int i1 = new Int(1,1);
+        Int i2 = new Int(1,2);
+        Int i3 = new Int(2,1);
+        Int i4 = new Int(2,2);
+        Int i5 = new Int(1,1);
+
+        q.add(i2);
+        q.add(i4);
+        q.add(i1);
+        q.add(i3);
+        q.add(i5);
+
+        int num = q.size();
+        for(int i = 0; i < num; ++i){
+            Int I = q.remove();
+            System.out.println(I.v + " " + I.s);
+        }
 
 
 
+    }
 
+
+    private static class Int implements Comparable<Int>{
+        int v;
+        int s;
+        public Int(int i, int s){
+            v = i;
+            this.s = s;
+        }
+
+        @Override
+        public int compareTo(Int o) {
+            if (v > o.v) {
+                return 1;
+            } else if (v < o.v) {
+                return -1;
+            } else { // heuristic the same
+                int i = Integer.compare(s, o.s);
+                if(i != 0) return i;
+                else return 1;
+            }
+        }
     }
 }

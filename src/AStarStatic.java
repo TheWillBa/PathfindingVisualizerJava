@@ -2,11 +2,10 @@ import sun.awt.image.ImageWatched;
 
 import java.util.*;
 
-public class AStarStatic {
+public class AStarStatic/* implements ShortestPathAlgorithm */{
 
     private int scalar = 10;
 
-    Node[][] nodes;
     int[][] map;
     Pos end;
 
@@ -39,17 +38,13 @@ public class AStarStatic {
     public void init(int[][] map, Pos start, Pos end){
         this.map = map;
         this.end = end;
-        nodes = new Node[map.length][map[0].length];
-        for(int i = 0; i < nodes.length; ++i){
-            for(int j = 0; j < nodes[0].length; ++j){
-                nodes[i][j] = new Node(i,j);
-            }
-        }
 
         open = new PriorityQueueSet<>();
         closed = new HashSet<>();
-        open.add(nodes[start.x][start.y]);
+        open.add(new Node(start.x, start.y));
     }
+
+
 
     public void tick() {
 
@@ -58,7 +53,7 @@ public class AStarStatic {
         Node current = open.dequeue();
         closed.add(current);
 
-        if (current.equals(nodes[end.x][end.y])) {
+        if (current.equals(new Node(end.x, end.y))) {
             LinkedList<Node> path = new LinkedList<>();
             while (current != null) {
                 path.addFirst(current);
@@ -68,6 +63,12 @@ public class AStarStatic {
             this.path = path;
             return;
         }
+/*
+        if(open.isEmpty()){
+            this.path = new LinkedList<>();
+            return;
+        }*/
+
 
         for (Node neighbor : neighbors(current)) {
             if (closed.contains(neighbor)) continue;
@@ -97,6 +98,16 @@ public class AStarStatic {
         return path;
     }
 
+    /**
+     * Finishes the search so done becomes true
+     */
+
+    public void finish() {
+        while(!done()){
+            tick();
+        }
+    }
+
     private List<Node> neighbors(Node current) {
         List<Node> r = new ArrayList<>();
 
@@ -110,7 +121,7 @@ public class AStarStatic {
             int val = safeGet(x,y);
 
             if(val == 0)
-                r.add(nodes[x][y]);
+                r.add(new Node(x, y));
         }
 
         return r;
@@ -135,32 +146,30 @@ public class AStarStatic {
     }
 
 
-    public class Node extends Pos implements Comparable<Node>{
+    public class Node extends Pos implements Comparable<Node> {
 
         private Node pred = null;
 
         private int gScore = 0;
-        private int hScore = manhattanDistanceFrom(x, y, end);
-        private final double weight = 0;
+        private final int hScore = manhattanDistanceFrom(x, y, end);
+        private final int weight = 1;
 
         public Node(int x, int y) {
             super(x, y);
         }
 
-        public Node(Pos p){
+        public Node(Pos p) {
             super(p.x, p.y);
         }
 
         @Override
         public int compareTo(Node p) {
 
-            if(fScore() > p.fScore()){
+            if (fScore() > p.fScore()) {
                 return 1;
-            }
-            else if(fScore() < p.fScore()){
+            } else if (fScore() < p.fScore()) {
                 return -1;
-            }
-            else { // heuristic the same
+            } else { // heuristic the same
                 return Integer.compare(hScore(), p.hScore());
             }
 
@@ -169,21 +178,21 @@ public class AStarStatic {
         /**
          * Used by the compareTo(), the sum of the f and g-score
          */
-        public int fScore(){
-            return gScore() + hScore();
+        public int fScore() {
+            return gScore() + weight * hScore();
         }
 
         /**
-         A calculated distance from the starting node based on the path to get to this node
+         * A calculated distance from the starting node based on the path to get to this node
          */
-        public int gScore(){
+        public int gScore() {
             return gScore;
         }
 
         /**
-         An estimate of the distance this PosH is from the goal; a heuristic value
+         * An estimate of the distance this Node is from the goal; a heuristic value
          */
-        public int hScore(){
+        public int hScore() {
             return hScore;
         }
 
@@ -197,8 +206,22 @@ public class AStarStatic {
                     ", y=" + y +
                     '}';
         }
-    }
+/*
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            Node node = (Node) o;
+            return gScore == node.gScore &&
+                    hScore == node.hScore;
+        }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), gScore, hScore);
+        }*/
+    }
 
     private static class PriorityQueueSet<T> {
         private final PriorityQueue<T> queue = new PriorityQueue<>();
@@ -218,5 +241,11 @@ public class AStarStatic {
         public boolean contains(T o){
             return set.contains(o);
         }
+
+        public boolean isEmpty(){
+            return queue.isEmpty();
+        }
+
+
     }
 }
