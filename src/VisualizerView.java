@@ -1,11 +1,10 @@
 import java.applet.Applet;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-public class VisualizerView extends JApplet {
+public class VisualizerView extends JApplet implements MouseMotionListener {
     private int[][] maze;
     private int side;
 
@@ -19,10 +18,16 @@ public class VisualizerView extends JApplet {
 
     boolean running = false;
 
+    int width = 15;
+    int height = 15;
+
+    GridCreator gc = new GridCreator(width, height);
+
 
 
     @Override
     public void init(){
+        /*
         int[][] smallMaze = new int[][]{ // temp variable for use to implement drawing the grid
                 {0, 0, 0, 0, 0, 0},
                 {1, 0, 1, 1, 1, 0},
@@ -102,7 +107,11 @@ public class VisualizerView extends JApplet {
                 {0, 0, 0, 0, 1, 0}
         };
 
-        maze = emptyMaze;
+        */
+
+
+
+        maze = gc.map();
 
 
         side = getWidth() / maze.length;
@@ -123,6 +132,9 @@ public class VisualizerView extends JApplet {
                 }
             }
         });
+
+        //addMouseListener(this);
+        addMouseMotionListener(this);
 
 
     }
@@ -160,21 +172,25 @@ public class VisualizerView extends JApplet {
                 queue = astar.queue();
                 closed = astar.closed();
 
+                Set<HeuristicNode> drawn = new HashSet<>();
 
-
+                for (HeuristicNode node : closed) {
+                    drawCell(g, node, Color.green);
+                    drawn.add(node);
+                }
 
 
                 int num = queue.size();
                 for (int i = 0; i < num; ++i) {
                     HeuristicNode node = queue.remove();
+
+                    if(drawn.contains(node)) continue;
+
                     drawCell(g, node, Color.red);
                     g.drawString(Integer.toString(i), node.y() * side + xOffset + side / 2, node.x() * side + yOffset + (int) (side * (3.0 / 4.0)));
                 }
 
-                for (HeuristicNode node : closed) {
-                    drawCell(g, node, Color.green);
-                }
-                delay(200000);
+                delay(20000);
             }
 
 
@@ -189,7 +205,7 @@ public class VisualizerView extends JApplet {
                 else c = Color.magenta;
 
                 drawCell(g, p, c);
-                delay(200000 / 5);
+                delay(20000 / 5);
             }
 
         }
@@ -234,4 +250,45 @@ public class VisualizerView extends JApplet {
             endDelay = System.nanoTime();
     }
 
+
+    private Pos lastPos = new GridPos(-1,-1);
+
+    /**
+     * Invoked when a mouse button is pressed on a component and then
+     * dragged.  <code>MOUSE_DRAGGED</code> events will continue to be
+     * delivered to the component where the drag originated until the
+     * mouse button is released (regardless of whether the mouse position
+     * is within the bounds of the component).
+     * <p>
+     * Due to platform-dependent Drag&amp;Drop implementations,
+     * <code>MOUSE_DRAGGED</code> events may not be delivered during a native
+     * Drag&amp;Drop operation.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        int y = (int) Math.floor((e.getX() - xOffset) / (side * 1.0));
+        int x = (int) Math.floor((e.getY() - yOffset) / (side * 1.0));
+
+        Pos p = new GridPos(x,y);
+        if(lastPos.equals(p)) return;
+
+        System.out.println(x + ", " + y);
+        gc.flip(x,y);
+        lastPos = p;
+        repaint();
+        //e.consume();
+    }
+
+    /**
+     * Invoked when the mouse cursor has been moved onto a component
+     * but no buttons have been pushed.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
 }
