@@ -17,32 +17,8 @@ public class VisualizerView extends JApplet {
     Set<HeuristicNode> closed = new HashSet<>();
     Queue<HeuristicNode> queue = new PriorityQueue<>();
 
-//    boolean running = false;
-//
-//    int delay = 300;
-//    int count = 0;
-//    javax.swing.Timer paintTimer = new javax.swing.Timer(30, new ActionListener() {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            System.out.println("painting...");
-//            if(running && count % (delay / 30) == 0){
-//                System.out.println("running");
-//                if(!astar.done()) queue = astar.queue();
-//                closed = astar.closed();
-//                astar.tick();
-//
-//                // TODO handle filling path
-//
-//                if(astar.done()){
-//                    running = false;
-//                    System.out.println("done");
-//                    paintTimer.stop();
-//                }
-//            }
-//            ++count;
-//            repaint();
-//        }
-//    });
+    boolean running = false;
+
 
 
     @Override
@@ -74,7 +50,7 @@ public class VisualizerView extends JApplet {
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         };
@@ -104,37 +80,32 @@ public class VisualizerView extends JApplet {
                 {0, 0, 0, 0, 1, 0},
                 {0, 0, 0, 0, 1, 0},
                 {0, 0, 0, 0, 1, 0},
-                {0, 1, 1, 1, 1, 1},
-                {0, 0, 0, 0, 0, 0}
+                {0, 1, 1, 1, 1, 0},
+                {0, 0, 0, 0, 1, 0}
         };
 
-        maze = weirdMaze;
+        maze = smallMaze;
 
 
         side = getWidth() / maze.length;
 
 
-        astar = new AStar();
-        astar.init(maze,
-                new GridPos(0,0),
-                new GridPos(maze.length - 1, maze[0].length - 1)
-        );
 
 
-//        Button button1 = new Button("Start");
-//        setLayout(null);
-//        button1.setBounds(0,0, 50, 20);
-//        add(button1);
-//        button1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if(!running){
-//                    running = true;
-//                }
-//            }
-//        });
-//
-//        paintTimer.start();
+        Button button1 = new Button("Start");
+        setLayout(null);
+        button1.setBounds(0,0, 50, 20);
+        add(button1);
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(!running){
+                    running = true;
+                    repaint();
+                }
+            }
+        });
+
 
     }
 
@@ -153,29 +124,39 @@ public class VisualizerView extends JApplet {
             }
         }
 
-
-        /*
+        if(running){
+              /*
         Draw the path on the grid as it searches
          */
+            astar = new AStar();
+            astar.init(maze,
+                    new GridPos(0,0),
+                    //new GridPos(5,14)
+                    new GridPos(maze.length - 1, maze[0].length - 1)
+            );
 
-        for (int u = 0; !astar.done(); astar.tick()) {
 
-            queue = astar.queue();
-            closed = astar.closed();
+            for (int u = 0; !astar.done(); astar.tick()) {
 
-            int num = queue.size();
-            for (int i = 0; i < num; ++i) {
-                HeuristicNode node = queue.remove();
-                drawCell(g, node, Color.red);
-                g.drawString(Integer.toString(i), node.y() * side + xOffset + side / 2, node.x() * side + yOffset + (int) (side * (3.0 / 4.0)));
+                queue = astar.queue();
+                closed = astar.closed();
+
+
+
+
+
+                int num = queue.size();
+                for (int i = 0; i < num; ++i) {
+                    HeuristicNode node = queue.remove();
+                    drawCell(g, node, Color.red);
+                    g.drawString(Integer.toString(i), node.y() * side + xOffset + side / 2, node.x() * side + yOffset + (int) (side * (3.0 / 4.0)));
+                }
+
+                for (HeuristicNode node : closed) {
+                    drawCell(g, node, Color.green);
+                }
+                delay(200000);
             }
-
-            for (HeuristicNode node : closed) {
-                drawCell(g, node, Color.green);
-            }
-
-            delay(200000);
-        }
 
 
 
@@ -183,14 +164,18 @@ public class VisualizerView extends JApplet {
         /*
         Draw the final path
          */
-        for (HeuristicNode p : astar.path()) {
-            Color c;
-            if (maze[p.x()][p.y()] != 0) c = (Color.red);
-            else c = Color.magenta;
+            for (HeuristicNode p : astar.path()) {
+                Color c;
+                if (maze[p.x()][p.y()] != 0) c = (Color.red);
+                else c = Color.magenta;
 
-            drawCell(g, p, c);
-            delay(200000 / 5);
+                drawCell(g, p, c);
+                delay(200000 / 5);
+            }
+
         }
+
+
 
 
     }
@@ -206,6 +191,7 @@ public class VisualizerView extends JApplet {
         g.drawRect(y*side + xOffset, x*side + yOffset,side, side);
         g.drawString(Integer.toString(node.fScore()), y*side + xOffset, x*side + yOffset + side/2);
         g.drawString(Integer.toString(node.hScore()), y*side + xOffset, x*side + yOffset + side);
+        g.drawString(Integer.toString(node.gScore()), y*side + xOffset + side/2, x*side + yOffset + side);
         g.setColor(pc);
     }
 

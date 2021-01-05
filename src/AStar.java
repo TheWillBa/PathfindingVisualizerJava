@@ -12,6 +12,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
 
     private List<Node> path = null;
 
+
     public Set<HeuristicNode> closed() {
         return new HashSet<>(closed);
     }
@@ -19,6 +20,9 @@ public class AStar/* implements ShortestPathAlgorithm */{
     public Queue<HeuristicNode> queue(){
         return new PriorityQueue<>(open.queue);
     }
+
+    private Map<Pos, Integer> gScores;
+    private Map<Pos, Node> predecessors;
 
     public int safeGet(int x, int y) {
         if (x >= 0 && x < map.length && y >= 0 && y < map[0].length) {
@@ -36,6 +40,10 @@ public class AStar/* implements ShortestPathAlgorithm */{
         open = new PriorityQueueSet<>();
         closed = new HashSet<>();
         open.add(new Node(start.x, start.y));
+
+        gScores = new HashMap<>();
+        gScores.put(new Node(start.x, start.y), 0);
+        predecessors = new HashMap<>();
     }
 
 
@@ -57,7 +65,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
             LinkedList<Node> path = new LinkedList<>();
             while (current != null) {
                 path.addFirst(current);
-                current = current.pred;
+                current = current.pred();
             }
 
             this.path = path;
@@ -70,13 +78,11 @@ public class AStar/* implements ShortestPathAlgorithm */{
 
             int temp_gScore = current.gScore() + scalar;
 
-            if (temp_gScore < neighbor.gScore || !open.contains(neighbor)) {
-                neighbor.gScore = temp_gScore;
-                neighbor.pred = current;
+            if (temp_gScore < neighbor.gScore() || !open.contains(neighbor)) {
+                neighbor.set_gScore(temp_gScore);
+                neighbor.setPred(current);
+                open.add(neighbor);
 
-                if (!open.contains(neighbor)) {
-                    open.add(neighbor);
-                }
 
             }
 
@@ -142,9 +148,6 @@ public class AStar/* implements ShortestPathAlgorithm */{
 
     public class Node extends GridPos implements Comparable<Node>, HeuristicNode {
 
-        private Node pred = null;
-
-        private int gScore = 0;
         private final int hScore = manhattanDistanceFrom(x, y, end);
         private final int weight = 1;
 
@@ -180,7 +183,19 @@ public class AStar/* implements ShortestPathAlgorithm */{
          * A calculated distance from the starting node based on the path to get to this node
          */
         public int gScore() {
-            return gScore;
+            return gScores.get(this) == null ? 0 : gScores.get(this);
+        }
+
+        public void set_gScore(int gScore){
+            gScores.put(this, gScore);
+        }
+
+        public Node pred(){
+            return predecessors.get(this);
+        }
+
+        public void setPred(Node pred){
+            predecessors.put(this, pred);
         }
 
         /**
@@ -193,8 +208,8 @@ public class AStar/* implements ShortestPathAlgorithm */{
         @Override
         public String toString() {
             return "Node{" +
-                    "gScore=" + gScore +
-                    ", hScore=" + hScore +
+                    "gScore=" + gScore() +
+                    ", hScore=" + hScore() +
                     ", fScore=" + fScore() +
                     ", x=" + x +
                     ", y=" + y +
