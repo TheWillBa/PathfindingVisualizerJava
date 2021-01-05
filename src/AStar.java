@@ -110,7 +110,8 @@ public class AStar/* implements ShortestPathAlgorithm */{
     private List<Node> neighbors(Node current) {
         List<Node> r = new ArrayList<>();
 
-        for (double t = 0; t < Math.PI * 2; t += Math.PI / 2) {
+        // The order that this returns the neighbors in effects the bias direction of the search
+        for (double t = 0; t > - Math.PI * 2; t -= Math.PI / 2) {
             int i = (int) Math.round(Math.cos(t));
             int ii = (int) Math.round(Math.sin(t));
 
@@ -166,8 +167,11 @@ public class AStar/* implements ShortestPathAlgorithm */{
                 return 1;
             } else if (fScore() < p.fScore()) {
                 return -1;
-            } else { // heuristic the same
-                return Integer.compare(hScore(), p.hScore());
+            } else {
+                return 0;
+
+                // This return makes the algorithm more greedy towards the goal
+                // return Integer.compare(hScore(), p.hScore());
             }
 
         }

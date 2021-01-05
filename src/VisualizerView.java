@@ -148,10 +148,10 @@ public class VisualizerView extends JApplet {
          */
             astar = new AStar();
             astar.init(maze,
-
+                    new GridPos(0,0),
                     //new GridPos(5,14)
-                    new GridPos(maze.length - 1,maze.length - 1),
-            new GridPos(0,0)
+                    new GridPos(maze.length - 1,maze.length - 1)
+
             );
 
 
