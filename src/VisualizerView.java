@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-public class VisualizerView extends JApplet implements MouseListener, MouseMotionListener {
+public class VisualizerView extends Applet implements MouseListener, MouseMotionListener {
     private int[][] maze;
     private int side;
 
@@ -25,6 +25,10 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
 
     Pos start = new GridPos(0,0);
     Pos end = new GridPos(width - 1, height - 1);
+
+    int weight = 1;
+
+    int delay = 10000;
 
 
 
@@ -112,15 +116,8 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
 
         */
 
-
-
         maze = gc.map();
-
-
         side = getWidth() / maze.length;
-
-
-
 
         Button button1 = new Button("Start");
         setLayout(null);
@@ -143,7 +140,8 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
             @Override
             public void actionPerformed(ActionEvent e) {
                     running = false;
-                    astar.reset();
+                    if(astar != null)
+                        astar.reset();
                     repaint();
                 }
             }
@@ -163,10 +161,6 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
 
         addMouseListener(this);
         addMouseMotionListener(this);
-
-
-
-
     }
 
 
@@ -200,7 +194,7 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
          */
             astar = new AStar();
             astar.init(maze, start, end);
-
+            astar.setWeight(weight);
 
             for (int u = 0; !astar.done(); astar.tick()) {
 
@@ -225,7 +219,11 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
                     g.drawString(Integer.toString(i), node.y() * side + xOffset + side / 2, node.x() * side + yOffset + (int) (side * (3.0 / 4.0)));
                 }
 
-                delay(20000);
+                HeuristicNode front = astar.queue().peek();
+                if(front != null)
+                    drawCell(g, front, Color.blue);
+
+                delay(delay);
             }
 
 
@@ -240,12 +238,10 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
                 else c = Color.magenta;
 
                 drawCell(g, p, c);
-                delay(20000 / 5);
+                delay(delay / 5);
             }
 
         }
-
-
 
         running = false;
     }
@@ -265,8 +261,7 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
         g.setColor(pc);
     }
 
-
-        public void drawCell(Graphics g, int x, int y, Color c){
+    public void drawCell(Graphics g, int x, int y, Color c){
         Color pc = g.getColor();
 
         g.setColor(c);
@@ -275,6 +270,12 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
         g.drawRect(y*side + xOffset, x*side + yOffset,side, side);
 
         g.setColor(pc);
+    }
+
+    public Pos canvasToGridPosition(Pos p){
+        int y = (int) Math.floor((p.x() - xOffset) / (side * 1.0));
+        int x = (int) Math.floor((p.y() - yOffset) / (side * 1.0));
+        return new GridPos(x,y);
     }
 
     public void delay(long n) {
@@ -303,15 +304,16 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
      */
     @Override
     public void mouseDragged(MouseEvent e) {
-        int y = (int) Math.floor((e.getX() - xOffset) / (side * 1.0));
-        int x = (int) Math.floor((e.getY() - yOffset) / (side * 1.0));
+
+        Pos p = canvasToGridPosition(new GridPos(e.getX(), e.getY()));
+        int x = p.x();
+        int y = p.y();
+
 
         if(start.equals(new GridPos(x,y)) || end.equals(new GridPos(x,y)) ) return;
 
-        Pos p = new GridPos(x,y);
         if(lastPos.equals(p)) return;
 
-        System.out.println(x + ", " + y);
         gc.flip(x,y);
         lastPos = p;
         repaint();
@@ -338,13 +340,11 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
     @Override
     public void mouseClicked(MouseEvent e) {
 
-
-
-        int y = (int) Math.floor((e.getX() - xOffset) / (side * 1.0));
-        int x = (int) Math.floor((e.getY() - yOffset) / (side * 1.0));
+        Pos p = canvasToGridPosition(new GridPos(e.getX(), e.getY()));
+        int x = p.x();
+        int y = p.y();
 
         if(start.equals(new GridPos(x,y)) || end.equals(new GridPos(x,y)) ) return;
-        System.out.println(x + ", " + y);
 
         gc.flip(x,y);
         repaint();

@@ -4,6 +4,7 @@ import java.util.function.Function;
 public class AStar/* implements ShortestPathAlgorithm */{
 
     private int scalar = 10;
+    private int weight = 1;
 
     private int[][] map;
     private Pos end;
@@ -17,17 +18,19 @@ public class AStar/* implements ShortestPathAlgorithm */{
     private final DistanceFunction d = (Pos p1, Pos p2) -> (euclideanDistanceFrom(p1.x(), p1.y(), p2));
     private final NeighborFunction nf = this::diagNeighbors;
 
-
     public Set<HeuristicNode> closed() {
         return new HashSet<>(closed);
     }
-
     public Queue<HeuristicNode> queue(){
         return new PriorityQueue<>(open.queue);
     }
 
     private Map<Pos, Integer> gScores;
     private Map<Pos, Node> predecessors;
+
+    public void setWeight(int w){
+        weight = w;
+    }
 
     public Pos start(){
         return start;
@@ -185,14 +188,13 @@ public class AStar/* implements ShortestPathAlgorithm */{
 
         private int gScore= 0;
         private final int hScore = d.distance(new GridPos(x, y), end);
-        private final int weight = 1;
 
         public Node(int x, int y) {
             super(x, y);
         }
 
-        public Node(GridPos p) {
-            super(p.x, p.y);
+        public Node(Pos p) {
+            super(p.x(), p.y());
         }
 
         @Override
