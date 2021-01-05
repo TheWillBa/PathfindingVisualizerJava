@@ -9,7 +9,7 @@ public class ModifiedBFSPlusAStar extends AbstractSearchAlgorithm {
     private Queue<PathSearch> todo;
     private TrackerCell[][] tracker;
 
-    public ModifiedBFSPlusAStar(int[][] map, Pos start, Pos end){
+    public ModifiedBFSPlusAStar(int[][] map, GridPos start, GridPos end){
         init(map, start, end);
     }
 
@@ -21,7 +21,7 @@ public class ModifiedBFSPlusAStar extends AbstractSearchAlgorithm {
      * @param end the goal <code>Pos</code> on the grid
      */
     @Override
-    public void init(int[][] map, Pos start, Pos end) {
+    public void init(int[][] map, GridPos start, GridPos end) {
         this.map = map;
         this.start = start;
         this.end = end;
@@ -44,8 +44,8 @@ public class ModifiedBFSPlusAStar extends AbstractSearchAlgorithm {
      * @return the s
      */
     @Override
-    public List<Pos> nextPoses() {
-        ArrayList<Pos> poses = new ArrayList<>();
+    public List<GridPos> nextPoses() {
+        ArrayList<GridPos> poses = new ArrayList<>();
         int i = 0;
         for(PathSearch ps : todo){
             poses.add(ps.current);
@@ -165,7 +165,7 @@ public class ModifiedBFSPlusAStar extends AbstractSearchAlgorithm {
             this.listSoFar = listSoFar;
         }
 
-        public Pos current(){
+        public GridPos current(){
             return current;
         }
 
@@ -183,7 +183,7 @@ public class ModifiedBFSPlusAStar extends AbstractSearchAlgorithm {
         return distanceFrom( x,  y, start) + distanceFrom(x, y, end) /* * 1.1*/;
     }
 
-    private int distanceFrom(int x, int y, Pos p) {
+    private int distanceFrom(int x, int y, GridPos p) {
         // Manhattan distance, use euclidean if can move diagonal
         int dx = Math.abs(x - p.x());
         int dy = Math.abs(y - p.y());
@@ -192,18 +192,18 @@ public class ModifiedBFSPlusAStar extends AbstractSearchAlgorithm {
     }
 
 
-    private class PosH extends Pos implements Comparable<Pos>{
+    private class PosH extends GridPos implements Comparable<GridPos>{
 
         public PosH(int x, int y) {
             super(x, y);
         }
 
-        public PosH(Pos p){
+        public PosH(GridPos p){
             super(p.x, p.y);
         }
 
         @Override
-        public int compareTo(Pos p) {
+        public int compareTo(GridPos p) {
             if(this.equals(p)) return 0;
 
 

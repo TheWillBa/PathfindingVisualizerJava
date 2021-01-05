@@ -5,7 +5,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
     private Queue<PathSearch> todo;
     private TrackerCell[][] tracker;
 
-    public ModifiedBFS(int[][] map, Pos start, Pos end){
+    public ModifiedBFS(int[][] map, GridPos start, GridPos end){
         init(map, start, end);
     }
 
@@ -17,7 +17,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
      * @param end the goal <code>Pos</code> on the grid
      */
     @Override
-    public void init(int[][] map, Pos start, Pos end) {
+    public void init(int[][] map, GridPos start, GridPos end) {
         this.map = map;
         this.start = start;
         this.end = end;
@@ -40,8 +40,8 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
      * @return the s
      */
     @Override
-    public List<Pos> nextPoses() {
-        ArrayList<Pos> poses = new ArrayList<>();
+    public List<GridPos> nextPoses() {
+        ArrayList<GridPos> poses = new ArrayList<>();
         int i = 0;
         for(PathSearch ps : todo){
             poses.add(ps.current);
@@ -59,12 +59,12 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
 
         PathSearch current = todo.remove();
 
-        Set<Pos> pathSoFar = current.pathSoFar;
+        Set<GridPos> pathSoFar = current.pathSoFar;
         int x = current.current.x();
         int y = current.current.y();
         boolean hasSkipped = current.hasSkipped;
 
-        Pos newPos = new Pos(x, y);
+        GridPos newPos = new GridPos(x, y);
         pathSoFar.add(newPos);
         current.listSoFar.add(newPos);
 
@@ -78,7 +78,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
             int i = (int) Math.round(Math.cos(t));
             int ii = (int) Math.round(Math.sin(t));
             int val = safeGet(i + x, ii + y);
-            Pos pos = new Pos(x + i, y + ii);
+            GridPos pos = new GridPos(x + i, y + ii);
 
             // Don't recurse if OOB, a wall, already reached here, or a potential skip and have skipped already
             if (val == -1 || val == 1 || pathSoFar.contains(pos) || (val == 2 && hasSkipped))
@@ -107,7 +107,7 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
                 skipped = true;
             }
 
-            PathSearch ps = new PathSearch(new HashSet<Pos>(pathSoFar), new LinkedList<>(current.listSoFar),skipped, pos);
+            PathSearch ps = new PathSearch(new HashSet<GridPos>(pathSoFar), new LinkedList<>(current.listSoFar),skipped, pos);
             todo.add(ps);
         }
     }
@@ -149,19 +149,19 @@ public class ModifiedBFS extends AbstractSearchAlgorithm {
     }
 
     private static class PathSearch {
-        Set<Pos> pathSoFar;
-        List<Pos> listSoFar;
+        Set<GridPos> pathSoFar;
+        List<GridPos> listSoFar;
         boolean hasSkipped;
-        Pos current;
+        GridPos current;
 
-        public PathSearch(Set<Pos> pathSoFar, List<Pos> listSoFar, boolean hasSkipped, Pos current) {
+        public PathSearch(Set<GridPos> pathSoFar, List<GridPos> listSoFar, boolean hasSkipped, GridPos current) {
             this.pathSoFar = pathSoFar;
             this.hasSkipped = hasSkipped;
             this.current = current;
             this.listSoFar = listSoFar;
         }
 
-        public Pos current(){
+        public GridPos current(){
             return current;
         }
     }

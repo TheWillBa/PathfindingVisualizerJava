@@ -2,9 +2,9 @@ import java.util.List;
 
 public abstract class AbstractSearchAlgorithm implements ShortestPathAlgorithm {
     protected int[][] map;
-    protected Pos start;
-    protected Pos end;
-    protected List<? extends Pos> path;
+    protected GridPos start;
+    protected GridPos end;
+    protected List<? extends GridPos> path;
 
     /**
      * Returns true if the algorithms has finished
@@ -22,7 +22,7 @@ public abstract class AbstractSearchAlgorithm implements ShortestPathAlgorithm {
      * @return a <code>List</code> of <code>Pos</code>s that are the optimal path for the grid
      */
     @Override
-    public List<? extends Pos> path() {
+    public List<? extends GridPos> path() {
         return path;
     }
 
