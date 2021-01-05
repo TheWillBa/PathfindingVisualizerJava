@@ -75,6 +75,24 @@ public class VisualizerView extends JApplet {
 
         };
 
+        int[][] emptyMaze = {
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
+
         int[][] uMaze = new int[][]{ // temp variable for use to implement drawing the grid
                 {0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 1, 0},
@@ -84,7 +102,7 @@ public class VisualizerView extends JApplet {
                 {0, 0, 0, 0, 1, 0}
         };
 
-        maze = smallMaze;
+        maze = emptyMaze;
 
 
         side = getWidth() / maze.length;
@@ -130,9 +148,10 @@ public class VisualizerView extends JApplet {
          */
             astar = new AStar();
             astar.init(maze,
-                    new GridPos(0,0),
+
                     //new GridPos(5,14)
-                    new GridPos(maze.length - 1, maze[0].length - 1)
+                    new GridPos(maze.length - 1,maze.length - 1),
+            new GridPos(0,0)
             );
 
 

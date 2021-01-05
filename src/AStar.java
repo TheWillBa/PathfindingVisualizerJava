@@ -76,14 +76,13 @@ public class AStar/* implements ShortestPathAlgorithm */{
         for (Node neighbor : neighbors(current)) {
             if (closed.contains(neighbor)) continue;
 
-            int temp_gScore = current.gScore() + scalar;
+            int temp_gScore = gScores.get(current) + scalar;
 
-            if (temp_gScore < neighbor.gScore() || !open.contains(neighbor)) {
+            if (!open.contains(neighbor) || temp_gScore < gScores.get(neighbor)) {
+                gScores.put(neighbor, temp_gScore);
                 neighbor.set_gScore(temp_gScore);
                 neighbor.setPred(current);
                 open.add(neighbor);
-
-
             }
 
         }
@@ -148,6 +147,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
 
     public class Node extends GridPos implements Comparable<Node>, HeuristicNode {
 
+        private int gScore= 0;
         private final int hScore = manhattanDistanceFrom(x, y, end);
         private final int weight = 1;
 
@@ -183,10 +183,11 @@ public class AStar/* implements ShortestPathAlgorithm */{
          * A calculated distance from the starting node based on the path to get to this node
          */
         public int gScore() {
-            return gScores.get(this) == null ? 0 : gScores.get(this);
+            return gScore;
         }
 
         public void set_gScore(int gScore){
+            this.gScore = gScore;
             gScores.put(this, gScore);
         }
 
