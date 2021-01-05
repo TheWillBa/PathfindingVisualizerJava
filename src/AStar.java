@@ -7,10 +7,10 @@ public class AStar/* implements ShortestPathAlgorithm */{
     private int[][] map;
     private GridPos end;
 
-    PriorityQueueSet<Node> open = new PriorityQueueSet<>();
-    Set<Node> closed = new HashSet<>();
+    private PriorityQueueSet<Node> open = new PriorityQueueSet<>();
+    private Set<Node> closed = new HashSet<>();
 
-    List<Node> path = null;
+    private List<Node> path = null;
 
     public Set<HeuristicNode> closed() {
         return new HashSet<>(closed);
