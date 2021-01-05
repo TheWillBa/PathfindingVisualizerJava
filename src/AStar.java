@@ -6,8 +6,8 @@ public class AStar/* implements ShortestPathAlgorithm */{
     private int scalar = 10;
 
     private int[][] map;
-    private GridPos end;
-    private GridPos start;
+    private Pos end;
+    private Pos start;
 
     private PriorityQueueSet<Node> open = new PriorityQueueSet<>();
     private Set<Node> closed = new HashSet<>();
@@ -29,6 +29,14 @@ public class AStar/* implements ShortestPathAlgorithm */{
     private Map<Pos, Integer> gScores;
     private Map<Pos, Node> predecessors;
 
+    public Pos start(){
+        return start;
+    }
+
+    public Pos end(){
+        return end;
+    }
+
     public int safeGet(int x, int y) {
         if (x >= 0 && x < map.length && y >= 0 && y < map[0].length) {
             // In bounds
@@ -42,17 +50,17 @@ public class AStar/* implements ShortestPathAlgorithm */{
         init(map, start, end);
     }
 
-    public void init(int[][] map, GridPos start, GridPos end){
+    public void init(int[][] map, Pos start, Pos end){
         this.map = map;
         this.end = end;
         this.start = start;
 
         open = new PriorityQueueSet<>();
         closed = new HashSet<>();
-        open.add(new Node(start.x, start.y));
+        open.add(new Node(start.x(), start.y()));
 
         gScores = new HashMap<>();
-        gScores.put(new Node(start.x, start.y), 0);
+        gScores.put(new Node(start.x(), start.y()), 0);
         predecessors = new HashMap<>();
     }
 
@@ -71,7 +79,7 @@ public class AStar/* implements ShortestPathAlgorithm */{
         Node current = open.dequeue();
         closed.add(current);
 
-        if (current.equals(new Node(end.x, end.y))) {
+        if (current.equals(new Node(end.x(), end.y()))) {
             LinkedList<Node> path = new LinkedList<>();
             while (current != null) {
                 path.addFirst(current);

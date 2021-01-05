@@ -23,6 +23,9 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
 
     GridCreator gc = new GridCreator(width, height);
 
+    Pos start = new GridPos(0,0);
+    Pos end = new GridPos(width - 1, height - 1);
+
 
 
     @Override
@@ -162,6 +165,8 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
         addMouseMotionListener(this);
 
 
+
+
     }
 
 
@@ -169,6 +174,8 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
     public void paint(Graphics g) {
 
         super.paint(g);
+
+
         /*
         Draws the main grid
          */
@@ -179,17 +186,20 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
             }
         }
 
+        /*
+        Draws the start and end points
+         */
+        drawCell(g, start.x(), start.y(), Color.yellow);
+        drawCell(g, end.x(), end.y(), Color.orange);
+
+
+
         if(running){
               /*
         Draw the path on the grid as it searches
          */
             astar = new AStar();
-            astar.init(maze,
-                    new GridPos(0,0),
-                    //new GridPos(5,14)
-                    new GridPos(maze.length - 1,maze.length - 1)
-
-            );
+            astar.init(maze, start, end);
 
 
             for (int u = 0; !astar.done(); astar.tick()) {
@@ -296,6 +306,8 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
         int y = (int) Math.floor((e.getX() - xOffset) / (side * 1.0));
         int x = (int) Math.floor((e.getY() - yOffset) / (side * 1.0));
 
+        if(start.equals(new GridPos(x,y)) || end.equals(new GridPos(x,y)) ) return;
+
         Pos p = new GridPos(x,y);
         if(lastPos.equals(p)) return;
 
@@ -325,9 +337,15 @@ public class VisualizerView extends JApplet implements MouseListener, MouseMotio
      */
     @Override
     public void mouseClicked(MouseEvent e) {
+
+
+
         int y = (int) Math.floor((e.getX() - xOffset) / (side * 1.0));
         int x = (int) Math.floor((e.getY() - yOffset) / (side * 1.0));
+
+        if(start.equals(new GridPos(x,y)) || end.equals(new GridPos(x,y)) ) return;
         System.out.println(x + ", " + y);
+
         gc.flip(x,y);
         repaint();
         e.consume();
